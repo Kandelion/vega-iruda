@@ -11,6 +11,11 @@ export class GandelRule implements TextRule {
     let diffDate = +(targetDate) - +(curDate);
 
     let alreadyLate = (diffDate < 0) || (curDate.getHours() < 7);
+    let notWorkingDay = (targetDate.getDay() == 0) || (targetDate.getDay() == 6);
+
+    if(notWorkingDay) {
+        return '오늘은 일하지 않는 날!!';
+    }
 
     // add 1day to prevent minus time
     diffDate = alreadyLate ? (diffDate + 3600 * 24) : diffDate;
