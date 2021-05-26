@@ -21,10 +21,10 @@ export class GandelRule implements TextRule {
     diffDate = alreadyLate ? (diffDate + 3600 * 24) : diffDate;
     diffDate /= 1000;
 
-    const diffHour = (diffDate / 3600);
-    const diffMin = (diffDate % 3600) / 60;
-    const diffSec = (diffDate % 60);
-    let msg = '희망 퇴근시간까지 : '+ diffHour.toFixed() + '시 ' + diffMin.toFixed() + '분!!';
+    const diffHour = Math.floor(diffDate / 3600);
+    const diffMin = Math.floor((diffDate % 3600) / 60);
+    const diffSec = Math.floor(diffDate % 60);
+    let msg = '희망 퇴근시간까지 : '+ diffHour + '시간 ' + diffMin + '분!!';
 
     if(alreadyLate) {
         msg += '.....오늘은 퇴근했을까?';
