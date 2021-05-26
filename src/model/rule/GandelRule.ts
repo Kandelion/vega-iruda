@@ -24,7 +24,7 @@ export class GandelRule implements TextRule {
     const diffHour = (diffDate / 3600);
     const diffMin = (diffDate % 3600) / 60;
     const diffSec = (diffDate % 60);
-    let msg = '간델의 다음 희망 퇴근시간까지 : '+ diffHour.toFixed() + '시 ' + diffMin.toFixed() + '분 ' + diffSec.toFixed() + '초!!';
+    let msg = '희망 퇴근시간까지 : '+ diffHour.toFixed() + '시 ' + diffMin.toFixed() + '분!!';
 
     if(alreadyLate) {
         msg += '.....오늘은 퇴근했을까?';
