@@ -1,34 +1,39 @@
-import { TextRule } from '../../framework/rule/TextRule';
+import { Response } from '../../framework/response/Response';
+import { TextResponse } from '../../framework/response/TextReponse';
+import { DiffTime, TargetDateRuleTemplate } from './TargetDateRuleTemplate';
 
-export class GandelRule implements TextRule {
+export class GandelRule extends TargetDateRuleTemplate {
   public match(src: string): boolean {
     return src == '!간' || src == '!간델';
   }
 
-  public async makeMessage(src: string): Promise<string> {
+  public async makeMessage(src: string): Promise<Response> {
     const curDate = new Date();
-    const targetDate = new Date(curDate.getFullYear(), curDate.getMonth(), curDate.getDate(), 19, 30, 0);
-    let diffDate = +(targetDate) - +(curDate);
+    const target = this.createTargetTime({
+      hour: 19,
+      minute: 30,
+    });
+    const todayDiff = this.getDiff(target.getTime());
+    const oneDay = 24 * 60 * 60 * 1000;
+    const tomorrowDiff = this.getDiff(target.getTime() + oneDay);
 
-    let alreadyLate = (diffDate < 0) || (curDate.getHours() < 7);
-    let notWorkingDay = (targetDate.getDay() == 0) || (targetDate.getDay() == 6);
+    const alreadyLate = todayDiff.hour < 0 || curDate.getHours() < 7;
+    const diff = alreadyLate ? tomorrowDiff : todayDiff;
 
-    if(notWorkingDay) {
-        return '오늘은 일하지 않는 날!!';
-    }
+    const diffKey = '간델의 다음 희망 퇴근시간까지';
+    const diffMessage = `${diffKey} : ${this.getDiffString(diff)}`;
+    const lateSuffix = this.getLateSuffix(alreadyLate);
+    const message = diffMessage + lateSuffix;
+    return new TextResponse(message);
+  }
 
-    // add 1day to prevent minus time
-    diffDate = alreadyLate ? (diffDate + 3600 * 24) : diffDate;
-    diffDate /= 1000;
+  private getDiffString(diff: DiffTime): string {
+    const { hour, minute, second } = diff;
+    return `${hour}시 ${minute}분 ${second}초!!`;
+  }
 
-    const diffHour = Math.floor(diffDate / 3600);
-    const diffMin = Math.floor((diffDate % 3600) / 60);
-    const diffSec = Math.floor(diffDate % 60);
-    let msg = '희망 퇴근시간까지 : '+ diffHour + '시간 ' + diffMin + '분!!';
-
-    if(alreadyLate) {
-        msg += '.....오늘은 퇴근했을까?';
-    }
-    return msg;
+  private getLateSuffix(late: boolean): string {
+    const lateSuffix = '.....오늘은 퇴근했을까?';
+    return late ? lateSuffix : '';
   }
 }
